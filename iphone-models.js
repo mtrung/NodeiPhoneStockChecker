@@ -98,6 +98,7 @@
     "MNCA2LL/A" : "US iPhone 7 256GB Gold (Sprint)",
     "MNCC2LL/A" : "US iPhone 7 256GB Rose Gold (Sprint)",
     "MNCD2LL/A" : "US iPhone 7 256GB Jet Black (Sprint)",
+
     "MN522LL/A" : "US iPhone 7 Plus 128GB Black (GSM AT&T)",
     "MN532LL/A" : "US iPhone 7 Plus 128GB Silver (GSM AT&T)",
     "MN552LL/A" : "US iPhone 7 Plus 128GB Gold (GSM AT&T)",
@@ -141,7 +142,11 @@
     "MNQR2LL/A" : "US iPhone 7 Plus 32GB Black (GSM AT&T)",
     "MNQT2LL/A" : "US iPhone 7 Plus 32GB Silver (GSM AT&T)",
     "MNQU2LL/A" : "US iPhone 7 Plus 32GB Gold (GSM AT&T)",
-    "MNQV2LL/A" : "US iPhone 7 Plus 32GB Rose Gold (GSM AT&T)"
+    "MNQV2LL/A" : "US iPhone 7 Plus 32GB Rose Gold (GSM AT&T)",
+
+    "MNQW2LL/A" : "US iPhone 7 Plus 32GB Black (GSM T-Mobile)",
+    "MNR12LL/A" : "US iPhone 7 Plus 32GB Black (Verizon)",
+    "MNR32LL/A" : "US iPhone 7 Plus 32GB Gold (Verizon)",   
 }
 
 }

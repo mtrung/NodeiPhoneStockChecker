@@ -256,6 +256,12 @@ function validateWantedModels() {
 
 //Go!
 if (validateWantedModels()) {
+  if (config.stores) {
+    console.log("Use user's store list");
+    getStock(config.stores);
+    return;
+  }
+
   rp(storesRequest)
     .then(function(stores) {
       console.log("Downloaded stores list");
