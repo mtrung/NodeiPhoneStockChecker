@@ -99,7 +99,7 @@ function checkStoreStock(store, storeCode, stock, storesWithStock, unfoundModels
     if (storeStock[modelCode] == undefined) {
       unfoundModels[modelCode] = 1;
     } else {
-      console.log(' '+modelCode+': '+storeStock[modelCode]);
+      console.log(' '+storeStock[modelCode]+': \t' + modelCode + ' ' + models.getDisplayStr(modelCode));
       if (storeStock[modelCode].toLowerCase() === "all") {
         addStoreToNotification(storesWithStock, store, modelCode, storeCode);
       }
