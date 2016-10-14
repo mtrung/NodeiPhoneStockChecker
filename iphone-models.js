@@ -168,7 +168,8 @@ iPhoneModels.forEach(function(element) {
 //     console.log(modelStr + ": " + models[modelStr]);
 // }
 
-function getDisplayStr(element) {
+function getDisplayStr(modelCode) {
+    let element = models[modelCode];
     if (typeof element == 'string' || element instanceof String) {
         return element;
     }
