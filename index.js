@@ -93,12 +93,16 @@ function processStock(stores, stock) {
  * @param {object} unfoundModels - associative array, models that were not found in the stores stock list will be added to this so that you can report back to the user that they may have a typo or non-existant model
  */
 function checkStoreStock(store, storeCode, stock, storesWithStock, unfoundModels) {
+  console.log('- Store: ' + store);
   var storeStock = stock[storeCode];
   config.modelsWanted.forEach(function(modelCode) {
     if (storeStock[modelCode] == undefined) {
       unfoundModels[modelCode] = 1;
-    } else if (storeStock[modelCode].toLowerCase() == "all") {
-      addStoreToNotification(storesWithStock, store, modelCode, storeCode);
+    } else {
+      console.log(' '+modelCode+': '+storeStock[modelCode]);
+      if (storeStock[modelCode].toLowerCase() === "all") {
+        addStoreToNotification(storesWithStock, store, modelCode, storeCode);
+      }
     }
   });
 }

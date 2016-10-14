@@ -9,10 +9,68 @@
  *
  * Author: Tom Thorpe
  */
+'use strict';
 
- module.exports = {
+const iPhoneModels = [
+{p:"AT&T",c:"Black",g:128,m:"52"},
+{p:"AT&T",c:"Silver",g:128,m:"53"},
+{p:"AT&T",c:"Gold",g:128,m:"55"},
+{p:"AT&T",c:"Rose Gold",g:128,m:"56"},
+{p:"AT&T",c:"Jet Black",g:128,m:"57"},
+{p:"AT&T",c:"Black",g:256,m:"59"},
+{p:"AT&T",c:"Silver",g:256,m:"5C"},
+{p:"AT&T",c:"Gold",g:256,m:"5D"},
+{p:"AT&T",c:"Rose Gold",g:256,m:"5E"},
+{p:"AT&T",c:"Jet Black",g:256,m:"5F"},
+{p:"T-Mobile",c:"Black",g:128,m:"5G"},
+{p:"T-Mobile",c:"Silver",g:128,m:"5H"},
+{p:"T-Mobile",c:"Gold",g:128,m:"5J"},
+{p:"T-Mobile",c:"Rose Gold",g:128,m:"5K"},
+{p:"T-Mobile",c:"Jet Black",g:128,m:"5L"},
+{p:"T-Mobile",c:"Black",g:256,m:"5M"},
+{p:"T-Mobile",c:"Silver",g:256,m:"5N"},
+{p:"T-Mobile",c:"Gold",g:256,m:"5P"},
+{p:"T-Mobile",c:"Rose Gold",g:256,m:"5Q"},
+{p:"T-Mobile",c:"Jet Black",g:256,m:"5R"},
+{p:"Verizon",c:"Black",g:128,m:"5T"},
+{p:"Verizon",c:"Silver",g:128,m:"5U"},
+{p:"Verizon",c:"Gold",g:128,m:"5V"},
+{p:"Verizon",c:"Rose Gold",g:128,m:"5W"},
+{p:"Verizon",c:"Jet Black",g:128,m:"5X"},
+{p:"Verizon",c:"Black",g:256,m:"5Y"},
+{p:"Verizon",c:"Silver",g:256,m:"60"},
+{p:"Verizon",c:"Gold",g:256,m:"61"},
+{p:"Verizon",c:"Rose Gold",g:256,m:"62"},
+{p:"Verizon",c:"Jet Black",g:256,m:"63"},
+{p:"Sprint",c:"Black",g:128,m:"64"},
+{p:"Sprint",c:"Silver",g:128,m:"65"},
+{p:"Sprint",c:"Gold",g:128,m:"66"},
+{p:"Sprint",c:"Rose Gold",g:128,m:"67"},
+{p:"Sprint",c:"Jet Black",g:128,m:"68"},
+{p:"Sprint",c:"Black",g:256,m:"69"},
+{p:"Sprint",c:"Silver",g:256,m:"6A"},
+{p:"Sprint",c:"Gold",g:256,m:"6C"},
+{p:"Sprint",c:"Rose Gold",g:256,m:"6D"},
+{p:"Sprint",c:"Jet Black",g:256,m:"6E"},
+{p:"AT&T",c:"Black",g:32,m:"QR"},
+{p:"AT&T",c:"Silver",g:32,m:"QT"},
+{p:"AT&T",c:"Gold",g:32,m:"QU"},
+{p:"AT&T",c:"Rose Gold",g:32,m:"QV"},
+{p:"T-Mobile",c:"Black",g:32,m:"QW"},
+{p:"T-Mobile",c:"Silver",g:32,m:"QX"},
+{p:"T-Mobile",c:"Gold",g:32,m:"QY"},
+{p:"T-Mobile",c:"Rose Gold",g:32,m:"R0"},
+{p:"Verizon",c:"Black",g:32,m:"R1"},
+{p:"Verizon",c:"Silver",g:32,m:"R2"},
+{p:"Verizon",c:"Gold",g:32,m:"R3"},
+{p:"Verizon",c:"Rose Gold",g:32,m:"R4"},
+{p:"Sprint",c:"Black",g:32,m:"R5"},
+{p:"Sprint",c:"Silver",g:32,m:"R6"},
+{p:"Sprint",c:"Gold",g:32,m:"R7"},
+{p:"Sprint",c:"Rose Gold",g:32,m:"R8" },
+];
 
-  models : {
+var models = {
     "MN8X2B/A": "UK iPhone 7 32GB Black",
     "MN8Y2B/A": "UK iPhone 7 32GB Silver",
     "MN902B/A": "UK iPhone 7 32GB Gold",
@@ -98,55 +156,19 @@
     "MNCA2LL/A" : "US iPhone 7 256GB Gold (Sprint)",
     "MNCC2LL/A" : "US iPhone 7 256GB Rose Gold (Sprint)",
     "MNCD2LL/A" : "US iPhone 7 256GB Jet Black (Sprint)",
+};
 
-    "MN522LL/A" : "US iPhone 7 Plus 128GB Black (GSM AT&T)",
-    "MN532LL/A" : "US iPhone 7 Plus 128GB Silver (GSM AT&T)",
-    "MN552LL/A" : "US iPhone 7 Plus 128GB Gold (GSM AT&T)",
-    "MN562LL/A" : "US iPhone 7 Plus 128GB Rose Gold (GSM AT&T)",
-    "MN572LL/A" : "US iPhone 7 Plus 128GB Jet Black (GSM AT&T)",
-    "MN592LL/A" : "US iPhone 7 Plus 256GB Black (GSM AT&T)",
-    "MN5C2LL/A" : "US iPhone 7 Plus 256GB Silver (GSM AT&T)",
-    "MN5D2LL/A" : "US iPhone 7 Plus 256GB Gold (GSM AT&T)",
-    "MN5E2LL/A" : "US iPhone 7 Plus 256GB Rose Gold (GSM AT&T)",
-    "MN5F2LL/A" : "US iPhone 7 Plus 256GB Jet Black (GSM AT&T)",
-    "MN5G2LL/A" : "US iPhone 7 Plus 128GB Black (GSM T-Mobile)",
-    "MN5H2LL/A" : "US iPhone 7 Plus 128GB Silver (GSM T-Mobile)",
-    "MN5J2LL/A" : "US iPhone 7 Plus 128GB Gold (GSM T-Mobile)",
-    "MN5K2LL/A" : "US iPhone 7 Plus 128GB Rose Gold (GSM T-Mobile)",
-    "MN5L2LL/A" : "US iPhone 7 Plus 128GB Jet Black (GSM T-Mobile)",
-    "MN5M2LL/A" : "US iPhone 7 Plus 256GB Black (GSM T-Mobile)",
-    "MN5N2LL/A" : "US iPhone 7 Plus 256GB Silver (GSM T-Mobile)",
-    "MN5P2LL/A" : "US iPhone 7 Plus 256GB Gold (GSM T-Mobile)",
-    "MN5Q2LL/A" : "US iPhone 7 Plus 256GB Rose Gold (GSM T-Mobile)",
-    "MN5R2LL/A" : "US iPhone 7 Plus 256GB Jet Black (GSM T-Mobile)",
-    "MN5T2LL/A" : "US iPhone 7 Plus 128GB Black (Verizon)",
-    "MN5U2LL/A" : "US iPhone 7 Plus 128GB Silver (Verizon)",
-    "MN5V2LL/A" : "US iPhone 7 Plus 128GB Gold (Verizon)",
-    "MN5W2LL/A" : "US iPhone 7 Plus 128GB Rose Gold (Verizon)",
-    "MN5X2LL/A" : "US iPhone 7 Plus 128GB Jet Black (Verizon)",
-    "MN5Y2LL/A" : "US iPhone 7 Plus 256GB Black (Verizon)",
-    "MN602LL/A" : "US iPhone 7 Plus 256GB Silver (Verizon)",
-    "MN612LL/A" : "US iPhone 7 Plus 256GB Gold (Verizon)",
-    "MN622LL/A" : "US iPhone 7 Plus 256GB Rose Gold (Verizon)",
-    "MN632LL/A" : "US iPhone 7 Plus 256GB Jet Black (Verizon)",
-    "MN642LL/A" : "US iPhone 7 Plus 128GB Black (Sprint)",
-    "MN652LL/A" : "US iPhone 7 Plus 128GB Silver (Sprint)",
-    "MN662LL/A" : "US iPhone 7 Plus 128GB Gold (Sprint)",
-    "MN672LL/A" : "US iPhone 7 Plus 128GB Rose Gold (Sprint)",
-    "MN682LL/A" : "US iPhone 7 Plus 128GB Jet Black (Sprint)",
-    "MN692LL/A" : "US iPhone 7 Plus 256GB Black (Sprint)",
-    "MN6A2LL/A" : "US iPhone 7 Plus 256GB Silver (Sprint)",
-    "MN6C2LL/A" : "US iPhone 7 Plus 256GB Gold (Sprint)",
-    "MN6D2LL/A" : "US iPhone 7 Plus 256GB Rose Gold (Sprint)",
-    "MN6E2LL/A" : "US iPhone 7 Plus 256GB Jet Black (Sprint)",
-    "MNQR2LL/A" : "US iPhone 7 Plus 32GB Black (GSM AT&T)",
-    "MNQT2LL/A" : "US iPhone 7 Plus 32GB Silver (GSM AT&T)",
-    "MNQU2LL/A" : "US iPhone 7 Plus 32GB Gold (GSM AT&T)",
-    "MNQV2LL/A" : "US iPhone 7 Plus 32GB Rose Gold (GSM AT&T)",
+iPhoneModels.forEach(function(element) {
+    let modelStr = 'MN' + element.m + '2LL/A';
+    let displayStr = 'iPhone 7+ ' + element.g + 'gb ' + element.c + ' ' + element.p;
+    models[modelStr] = displayStr;
+    // console.log(modelStr + ": " + models[modelStr]);
+}, this);
 
-    "MNQW2LL/A" : "US iPhone 7 Plus 32GB Black (GSM T-Mobile)",
-    "MNR12LL/A" : "US iPhone 7 Plus 32GB Black (Verizon)",
-    "MNR32LL/A" : "US iPhone 7 Plus 32GB Gold (Verizon)",   
-}
+// for (let modelStr in models) {
+//     console.log(modelStr + ": " + models[modelStr]);
+// }
 
+module.exports = {
+    models: models
 }
