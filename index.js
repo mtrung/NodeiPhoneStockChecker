@@ -121,7 +121,7 @@ function addStoreToNotification(storesWithStock, store, modelCode, storeCode) {
   var cached = notificationsSentCache.get(key);
   if (cached == undefined) {
     notificationsSentCache.set(key, "sent");
-    storesWithStock.push(store + " has stock of " + models.models[modelCode]);
+    storesWithStock.push(store + " has stock of " + models.getDisplayStr(modelCode));
   }
 }
 

@@ -160,8 +160,7 @@ var models = {
 
 iPhoneModels.forEach(function(element) {
     let modelStr = 'MN' + element.m + '2LL/A';
-    let displayStr = 'iPhone 7+ ' + element.g + 'gb ' + element.c + ' ' + element.p;
-    models[modelStr] = displayStr;
+    models[modelStr] = element;
     // console.log(modelStr + ": " + models[modelStr]);
 }, this);
 
@@ -169,6 +168,14 @@ iPhoneModels.forEach(function(element) {
 //     console.log(modelStr + ": " + models[modelStr]);
 // }
 
+function getDisplayStr(element) {
+    if (typeof element == 'string' || element instanceof String) {
+        return element;
+    }
+    return 'iPhone 7+ ' + element.g + 'gb ' + element.c + ' ' + element.p;
+}
+    
 module.exports = {
-    models: models
+    models: models,
+    getDisplayStr: getDisplayStr
 }
