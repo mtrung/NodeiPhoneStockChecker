@@ -12,6 +12,10 @@ var notificationsSentCache = new NodeCache({
 });
 var prowlApiKey = "";
 
+var storesRequest = {
+  uri: 'https://reserve.cdn-apple.com/US/en_US/reserve/iPhone/stores.json',
+  json: true
+};
 
 /**
  * Begin the process to check the stock, then recursively calls itself asyncronously to check the stock again after interval time
@@ -20,7 +24,7 @@ var prowlApiKey = "";
 function getStock(stores, stockRequest, modelsWanted, interval) {
     if (validateWantedModels(modelsWanted)) {
         if (stores) {
-            console.log("Use user's store list");
+            console.log("# of stores: " + Object.keys(stores).length);
             if (!interval) {
                 getStockRequest(stores, stockRequest, modelsWanted);
             } else {
@@ -33,6 +37,21 @@ function getStock(stores, stockRequest, modelsWanted, interval) {
                     })
             }
         } else {
+            requestPromise(storesRequest)
+                .then(function (stores) {
+                    console.log("Downloaded stores list");
+                    var storesFlattend = {};
+                    stores.stores.forEach(function (store) {
+                        storesFlattend[store.storeNumber] = store.storeName
+                    });
+
+                    sendProwlMessage("Stores list has been successfully downloaded, stock checker will now start. This is a test prowl message to preview the message you will get when stock arrives", 2);
+
+                    getStock(storesFlattend, stockRequest, modelsWanted, interval);
+                })
+                .catch(function (err) {
+                    reportError("Error downloading stores " + err);
+                });
 
         }
     } else {
@@ -47,7 +66,7 @@ function getStock(stores, stockRequest, modelsWanted, interval) {
 function getStockRequest(stores, stockRequest, modelsWanted) {
   return requestPromise(stockRequest)
     .then(function(stock) {
-      console.log("Got stock list");
+      console.log("---");
       processStock(stores, stock, modelsWanted);
     })
     .catch(function(err) {
@@ -85,14 +104,14 @@ function processStock(stores, stock, modelsWanted) {
  * @param {object} unfoundModels - associative array, models that were not found in the stores stock list will be added to this so that you can report back to the user that they may have a typo or non-existant model
  */
 function checkStoreStock(store, storeCode, stock, storesWithStock, unfoundModels, modelsWanted) {
-  console.log('- Store: ' + store);
+//   console.log('- Store: ' + store);
   var storeStock = stock[storeCode];
 
   modelsWanted.forEach(function(modelCode) {
     if (storeStock[modelCode] == undefined) {
       unfoundModels[modelCode] = 1;
     } else {
-      console.log(' '+storeStock[modelCode]+': \t' + modelCode + ' ' + models.getDisplayStr(modelCode));
+    //   console.log(' '+storeStock[modelCode]+': \t' + modelCode + ' ' + models.getDisplayStr(modelCode));
       if (storeStock[modelCode].toLowerCase() === "all") {
         addStoreToNotification(storesWithStock, store, modelCode, storeCode);
       }
@@ -158,7 +177,7 @@ function addStoreToNotification(storesWithStock, store, modelCode, storeCode) {
   var cached = notificationsSentCache.get(key);
   if (cached == undefined) {
     notificationsSentCache.set(key, "sent");
-    storesWithStock.push(store + " has stock of " + models.getDisplayStr(modelCode));
+    storesWithStock.push(store + " has " + models.getDisplayStr(modelCode));
   }
 }
 
@@ -204,7 +223,7 @@ function sendProwlMessage(message, priority) {
         console.log("Error sending push notification" + err);
       });
   } else {
-    console.log("Prowl message skipped due to no api key");
+    //console.log("Prowl message skipped due to no api key");
   }
 }
 

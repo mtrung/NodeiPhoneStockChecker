@@ -6,10 +6,10 @@ var config = require("./config.js");
 var request = require('./request.js');
 
 
-var storesRequest = {
-  uri: config.storesJsonUrl,
-  json: true
-};
+// var storesRequest = {
+//   uri: config.storesJsonUrl,
+//   json: true
+// };
 
 var stockRequest = {
   uri: config.stockJsonUrl,
@@ -17,25 +17,27 @@ var stockRequest = {
 };
 
 //Go!
-if (request.validateWantedModels(config.modelsWanted)) {
-  if (config.stores) {
-    request.getStock(config.stores, stockRequest, config.modelsWanted);
-    return;
-  }
+request.getStock(config.stores, stockRequest, config.modelsWanted);
 
-  requestPromise(storesRequest)
-    .then(function(stores) {
-      console.log("Downloaded stores list");
-      var storesFlattend = {};
-      stores.stores.forEach(function(store) {
-        storesFlattend[store.storeNumber] = store.storeName
-      });
+// if (request.validateWantedModels(config.modelsWanted)) {
+//   if (config.stores) {
+//     request.getStock(config.stores, stockRequest, config.modelsWanted);
+//     return;
+//   }
 
-      request.sendProwlMessage("Stores list has been successfully downloaded, stock checker will now start. This is a test prowl message to preview the message you will get when stock arrives", 2);
+//   requestPromise(storesRequest)
+//     .then(function(stores) {
+//       console.log("Downloaded stores list");
+//       var storesFlattend = {};
+//       stores.stores.forEach(function(store) {
+//         storesFlattend[store.storeNumber] = store.storeName
+//       });
 
-      request.getStock(storesFlattend, stockRequest, config.modelsWanted)
-    })
-    .catch(function(err) {
-      request.reportError("Error downloading stores " + err);
-    });
-}
+//       request.sendProwlMessage("Stores list has been successfully downloaded, stock checker will now start. This is a test prowl message to preview the message you will get when stock arrives", 2);
+
+//       request.getStock(storesFlattend, stockRequest, config.modelsWanted)
+//     })
+//     .catch(function(err) {
+//       request.reportError("Error downloading stores " + err);
+//     });
+// }
