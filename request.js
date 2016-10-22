@@ -2,6 +2,7 @@ var requestPromise = require('request-promise');
 var models = require("./iphone-models.js");
 var NodeCache = require("node-cache");
 var notify = require("./notify.js");
+var config = require("./config.js");
 
 /**
  * Cache to stop messages being sent about stock on every request. If a message was already sent in last x seconds, it wont be sent again
@@ -11,32 +12,27 @@ var notificationsSentCache = new NodeCache({
   checkperiod: 120
 });
 
-var storesRequest = {
-  uri: 'https://reserve.cdn-apple.com/US/en_US/reserve/iPhone/stores.json',
-  json: true
-};
-
 /**
  * Begin the process to check the stock, then recursively calls itself asyncronously to check the stock again after interval time
  * @param {object} stores - flattend associative array of stores. Store code as the key, and the store name as the value
  */
-function getStock(stores, stockRequest, modelsWanted, interval) {
+function getStock(stores, modelsWanted) {
     if (validateWantedModels(modelsWanted)) {
         if (stores) {
             console.log("# of stores: " + Object.keys(stores).length);
-            if (!interval) {
-                getStockRequest(stores, stockRequest, modelsWanted);
+            if (!config.interval) {
+                getStockRequest(stores, modelsWanted);
             } else {
-                getStockRequest(stores, stockRequest, modelsWanted)
-                    .delay(interval)
+                getStockRequest(stores, modelsWanted)
+                    .delay(config.interval)
                     .then(function () {
                         process.nextTick(function () {
-                            getStockRequest(stores, stockRequest, modelsWanted);
+                            getStockRequest(stores, modelsWanted);
                         }); //nexttick to stop memory leaking in recursion, force async
-                    })
+                    });
             }
         } else {
-            requestPromise(storesRequest)
+            requestPromise(config.storesRequest)
                 .then(function (stores) {
                     console.log("Downloaded stores list");
                     var storesFlattend = {};
@@ -46,7 +42,7 @@ function getStock(stores, stockRequest, modelsWanted, interval) {
 
                     notify.sendProwlMessage("Stores list has been successfully downloaded, stock checker will now start. This is a test prowl message to preview the message you will get when stock arrives", 2);
 
-                    getStock(storesFlattend, stockRequest, modelsWanted, interval);
+                    getStock(storesFlattend, modelsWanted);
                 })
                 .catch(function (err) {
                     reportError("Error downloading stores " + err);
@@ -62,8 +58,8 @@ function getStock(stores, stockRequest, modelsWanted, interval) {
  * Makes a single call to the stock url to check the stock.
  * @param {object} stores - flattend associative array of stores. Store code as the key, and the store name as the value
  */
-function getStockRequest(stores, stockRequest, modelsWanted) {
-  return requestPromise(stockRequest)
+function getStockRequest(stores, modelsWanted) {
+  return requestPromise(config.stockRequest)
     .then(function(stock) {
       console.log("---");
       processStock(stores, stock, modelsWanted);

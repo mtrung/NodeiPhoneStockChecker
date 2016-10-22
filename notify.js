@@ -1,6 +1,6 @@
 
 var requestPromise = require('request-promise');
-var prowlApiKey = "";
+var config = require("./config.js");
 
 /**
  * Sends a message over prowl to the user if theprowlApiKey variable is set up.
@@ -9,12 +9,12 @@ var prowlApiKey = "";
  * @param {int} priority A priority between -2 (least priority) an 2 (most priority) as defined in the prowl API
  */
 function sendProwlMessage(message, priority) {
-  if (this.prowlApiKey && this.prowlApiKey.length > 0) {
+  if (config.prowlApiKey && config.prowlApiKey.length > 0) {
     var prowlApiRequest = {
       method: 'POST',
       uri: 'https://api.prowlapp.com/publicapi/add',
       form: {
-        apikey: this.prowlApiKey,
+        apikey: config.prowlApiKey,
         priority: priority,
         application: "Stock Checker",
         "event": "iPhone 7 Stock",
@@ -35,6 +35,5 @@ function sendProwlMessage(message, priority) {
 }
 
 module.exports = {
-	sendProwlMessage: sendProwlMessage,
-	prowlApiKey: prowlApiKey
+	sendProwlMessage: sendProwlMessage
 };
