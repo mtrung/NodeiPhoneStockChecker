@@ -1,7 +1,7 @@
 var requestPromise = require('request-promise');
 var models = require("./iphone-models.js");
 var NodeCache = require("node-cache");
-
+var notify = require("./notify.js");
 
 /**
  * Cache to stop messages being sent about stock on every request. If a message was already sent in last x seconds, it wont be sent again
@@ -10,7 +10,6 @@ var notificationsSentCache = new NodeCache({
   stdTTL: 300,
   checkperiod: 120
 });
-var prowlApiKey = "";
 
 var storesRequest = {
   uri: 'https://reserve.cdn-apple.com/US/en_US/reserve/iPhone/stores.json',
@@ -45,7 +44,7 @@ function getStock(stores, stockRequest, modelsWanted, interval) {
                         storesFlattend[store.storeNumber] = store.storeName
                     });
 
-                    sendProwlMessage("Stores list has been successfully downloaded, stock checker will now start. This is a test prowl message to preview the message you will get when stock arrives", 2);
+                    notify.sendProwlMessage("Stores list has been successfully downloaded, stock checker will now start. This is a test prowl message to preview the message you will get when stock arrives", 2);
 
                     getStock(storesFlattend, stockRequest, modelsWanted, interval);
                 })
@@ -136,7 +135,7 @@ function sendStockMessage(storesWithStock) {
       });
 
       console.log(message);
-      sendProwlMessage(message, 2);
+      notify.sendProwlMessage(message, 2);
 
     })
     
@@ -195,37 +194,6 @@ function chunk (array, size) {
 
 
 
-/**
- * Sends a message over prowl to the user if theprowlApiKey variable is set up.
- * Does nothing if no api key exists
- * @param {string} message The message to send. This is the exact text that will get sent as the notification
- * @param {int} priority A priority between -2 (least priority) an 2 (most priority) as defined in the prowl API
- */
-function sendProwlMessage(message, priority) {
-  if (prowlApiKey.length > 0) {
-    var prowlApiRequest = {
-      method: 'POST',
-      uri: 'https://api.prowlapp.com/publicapi/add',
-      form: {
-        apikey: prowlApiKey,
-        priority: priority,
-        application: "Stock Checker",
-        "event": "iPhone 7 Stock",
-        description: message,
-      },
-    };
-
-    requestPromise(prowlApiRequest)
-      .then(function() {
-        console.log("push notification sent");
-      })
-      .catch(function(err) {
-        console.log("Error sending push notification" + err);
-      });
-  } else {
-    //console.log("Prowl message skipped due to no api key");
-  }
-}
 
 /**
  * Logs an error on the console and by sending a prowl message
@@ -234,7 +202,7 @@ function sendProwlMessage(message, priority) {
 function reportError(error) {
   var message = "iPhone Stock Checker Error: " + error;
   console.log("ERROR:" + message);
-  sendProwlMessage(message, 0);
+  notify.sendProwlMessage(message, 0);
 }
 
 /**
