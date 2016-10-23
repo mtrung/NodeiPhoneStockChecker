@@ -4,7 +4,7 @@ var models = require("./iphone-models.js");
 
 class DeviceModel {
     static headers() {
-        return ['Model code','Model','Color','GB','Carrier'];
+        return ['Model code','Model','Color','GB','Carrier','Display'];
     }
 
 	constructor(modelCode) {
@@ -16,7 +16,7 @@ class DeviceModel {
 		return this._modelCode;
 	}
 	get modelName() {
-		return models.getDisplayStr(this._modelCode);
+		return 'iPhone 7+ ' + this._modelObj.g + 'gb ' + this._modelObj.c + ' ' + this._modelObj.p;
 	}
 	get color() {
 		return this._modelObj.c;
@@ -26,7 +26,10 @@ class DeviceModel {
 	}
 	get storage() {
 		return this._modelObj.g;
-	}	
+	}
+	get display() {
+		return '5.5 inch display';
+	}
 }
 
 module.exports = DeviceModel;

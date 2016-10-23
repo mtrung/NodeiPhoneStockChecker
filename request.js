@@ -11,8 +11,8 @@ var StockItem = require("./stock-item.js");
  * Cache to stop messages being sent about stock on every request. If a message was already sent in last x seconds, it wont be sent again
  */
 var notificationsSentCache = new NodeCache({
-  stdTTL: 300,
-  checkperiod: 120
+  stdTTL: 28800,// 8 hr
+  checkperiod: 0
 });
 
 /**
@@ -20,31 +20,30 @@ var notificationsSentCache = new NodeCache({
  * @param {object} stores - flattend associative array of stores. Store code as the key, and the store name as the value
  */
 function getStock(userSession, callback) {
-  var stores = userSession.storesWanted;
   if (validateWantedModels(userSession.modelsWanted)) {
-    if (stores) {
-      console.log("# of stores: " + Object.keys(stores).length);
+    if (userSession.storesWanted) {
       if (!config.interval) {
-        getStockRequest(stores, userSession.modelsWanted, callback);
+        getStockRequest(userSession, callback);
       } else {
-        getStockRequest(stores, userSession.modelsWanted, callback)
+        getStockRequest(userSession, callback)
           .delay(config.interval)
           .then(function () {
             process.nextTick(function () {
-              getStockRequest(stores, userSession.modelsWanted, callback);
+              getStockRequest(userSession, callback);
             }); //nexttick to stop memory leaking in recursion, force async
           });
       }
     } else {
       requestPromise(config.storesRequest)
-        .then(function (stores) {
+        .then(function (resultStores) {
           console.log("Downloaded stores list");
-          var storesFlattend = {};
-          stores.stores.forEach(function (store) {
-            storesFlattend[store.storeNumber] = store.storeName;
+          var storesFlattend = [];
+          resultStores.stores.forEach(function (store) {
+            //storesFlattend[store.storeNumber] = store.storeName;
+            storesFlattend.push(store.storeNumber);
           });
 
-          notify.sendProwlMessage("Stores list has been successfully downloaded, stock checker will now start. This is a test prowl message to preview the message you will get when stock arrives", 2);
+          //notify.sendProwlMessage("Stores list has been successfully downloaded, stock checker will now start. This is a test prowl message to preview the message you will get when stock arrives", 2);
 
           userSession.storesWanted = storesFlattend;
           getStock(userSession, callback);
@@ -64,11 +63,15 @@ function getStock(userSession, callback) {
  * Makes a single call to the stock url to check the stock.
  * @param {object} stores - flattend associative array of stores. Store code as the key, and the store name as the value
  */
-function getStockRequest(stores, modelsWanted, callback) {
+function getStockRequest(userSession, callback) {
+  console.log("models wanted: " + userSession.modelsWanted.length);
+  console.log("stores wanted: " + userSession.storesWanted.length);
+  console.log("showAll: " + userSession.showAll);
+
   return requestPromise(config.stockRequest)
     .then(function(resultStock) {
-      //console.log("---");
-      var storesWithStock = processStoreListResult(resultStock, stores, modelsWanted);
+      var storesWithStock = processStoreListResult(resultStock, userSession);
+      console.log("--- " + storesWithStock.length);
       callback(storesWithStock);
     })
     .catch(function(err) {
@@ -82,21 +85,31 @@ function getStockRequest(stores, modelsWanted, callback) {
  * @param {object} stores - flattend associative array of stores. Store code as the key, and the store name as the value
  * @param {object} stock - parsed json retreived from the stock url
  */
-function processStoreListResult(resultStock, stores, modelsWanted) {
-  var storesWithStock = [];
+function processStoreListResult(resultStock, userSession, shouldNotify) {
+  var stockItemList = [];
   var unfoundModels = {}; //where the model code doesnt exist
 
-  Object.keys(resultStock).forEach(function(storeCode) {
-    var storeName = stores[storeCode];
-    if (storeName == undefined) {
-      return; //skip non-stores
+  // Object.keys(resultStock).forEach(function(storeCode) {
+  //   var storeName = stores[storeCode];
+  //   if (storeName == undefined) {
+  //     return; //skip non-stores
+  //   }
+  //   processSingleStoreResult(storeCode, resultStock, storesWithStock, unfoundModels, modelsWanted, userSession.showAll);
+  // });
+  
+  userSession.storesWanted.forEach(storeCode => {
+    let inStockStore = resultStock[storeCode];
+    if (inStockStore) {
+      processSingleStoreResult(storeCode, inStockStore, stockItemList, unfoundModels, userSession);
     }
-    processSingleStoreResult(storeCode, resultStock, storesWithStock, unfoundModels, modelsWanted);
   });
 
-  notify.sendStockMessage(storesWithStock);
-  sendUnfoundModelsMessage(unfoundModels);
-  return storesWithStock;
+  if (shouldNotify) {
+    notify.sendStockMessage(stockItemList);
+    sendUnfoundModelsMessage(unfoundModels);
+  }
+  
+  return stockItemList;
 }
 
 /**
@@ -107,24 +120,26 @@ function processStoreListResult(resultStock, stores, modelsWanted) {
  * @param {array} storesWithStock - A string array, stores that have stock of the model you are interest in will be added to this array (in the format of a user displayable string message saying x store has stock of y)
  * @param {object} unfoundModels - associative array, models that were not found in the stores stock list will be added to this so that you can report back to the user that they may have a typo or non-existant model
  */
-function processSingleStoreResult(storeCode, stock, storesWithStock, unfoundModels, modelsWanted) {
+function processSingleStoreResult(storeCode, inStockStore, stockItemList, unfoundModels, userSession) {
   //console.log('- Store: ' + storeCode);
-  var storeStock = stock[storeCode];
-
-  modelsWanted.forEach(function (modelCode) {
-    if (storeStock[modelCode] == undefined) {
+  userSession.modelsWanted.forEach(function (modelCode) {
+    let availStatus = inStockStore[modelCode]; 
+    if (availStatus == undefined) {
       unfoundModels[modelCode] = 1;
-    } else {
-      //console.log(' ' + storeStock[modelCode] + ': \t' + modelCode + ' ' + models.getDisplayStr(modelCode));
-      let availStatus = storeStock[modelCode];
-      let stockItem = new StockItem(storeCode, modelCode, availStatus);
-      
+    } else {      
       if (availStatus === "ALL") {
-        timeStamp = addStoreToNotification(storesWithStock, modelCode, storeCode);
+        let stockItem = new StockItem(storeCode, modelCode, availStatus);
+        let timeStamp = addStoreToNotification(modelCode, storeCode);
         stockItem.timeStamp = timeStamp;
-      }
-
-      storesWithStock.push(stockItem);
+        stockItemList.push(stockItem);
+        // console.log('+'+ stockItem.modelName);
+      } else {
+        //console.log('- '+userSession.showAll + ': ');
+        if (userSession.showAll && userSession.showAll == true) {
+        let stockItem = new StockItem(storeCode, modelCode, availStatus);
+        stockItemList.push(stockItem);
+        console.log('- '+userSession.showAll + ': '+ stockItem.modelName);
+      }}
     }
   });
 }
@@ -155,16 +170,14 @@ function sendUnfoundModelsMessage(unfoundModels) {
  * @param {string} modelCode - The model found in stock
  * @param {object} storeCode - the store code (e.g. R232) the stock was found in
  */
-function addStoreToNotification(storesWithStock, modelCode, storeCode) {
+function addStoreToNotification(modelCode, storeCode) {
   //check if it is in the cache to say a notification was already recently sent about this store
   var key = storeCode + modelCode;
   var cached = notificationsSentCache.get(key);
   // if new
   if (cached == undefined) {
-    var nowStr = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
-    notificationsSentCache.set(key, nowStr);
-    cached = notificationsSentCache.get(key);
-    //storesWithStock.push(store + " has " + models.getDisplayStr(modelCode));
+    cached = Date.now();
+    notificationsSentCache.set(key, cached);
   }
   return cached;
 }
@@ -217,6 +230,4 @@ function validateWantedModels(modelsWanted) {
 
 module.exports = {
     getStock: getStock,
-    validateWantedModels: validateWantedModels,
-    reportError: reportError
 }

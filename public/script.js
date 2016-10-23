@@ -5,6 +5,17 @@ $(function() {
     setSpinnerActive(true);
   });
 
+  $('.refreshButton').click(function() {
+    window.location.reload();
+  });
+
+  $('#switch-1').change(function () {
+    var currVal = $(this).val();
+    var nextVal = (currVal === '0') ? '1' : '0';
+    $(this).val(nextVal);
+    alert( nextVal );
+  });
+
   $('.summary').click(function(){
      $(this).parent().toggleClass('expand').nextUntil('tr.main_row').toggle(100);
   });

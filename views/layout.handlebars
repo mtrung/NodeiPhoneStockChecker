@@ -29,7 +29,6 @@
     <header class="mdl-layout__header mdl-layout__header--scroll mdl-color--primary">
       <!--<div class="mdl-layout--large-screen-only mdl-layout__header-row"></div>-->
       <div class="mdl-layout__header-row mdl-layout__header--transparent">
-        <!--<h3><a href="/">Fossil CDG JIRA issues</a></h3>-->
       <!-- Title -->
       <span class="mdl-layout-title">iPhone stock check</span>
       <!-- Add spacer, to align navigation to the right -->  
@@ -37,8 +36,8 @@
       <!-- Navigation -->
       <nav class="mdl-navigation">
         <a class="mdl-navigation__link sam" href="/">Check stock</a>
-        <a class="mdl-navigation__link sam" href="/models">Models</a>
-        <a class="mdl-navigation__link rmm" href="/stores">Stores</a>
+        <a class="mdl-navigation__link sam" href="/models">Selected models</a>
+        <a class="mdl-navigation__link rmm" href="/applestores">Selected Apple stores</a>
       </nav>
         
         <div id="spinner" class="mdl-spinner mdl-js-spinner"></div>
@@ -52,9 +51,10 @@
       <div class="mdl-layout--large-screen-only mdl-layout__header-row"></div>
     </header>
   <div class="mdl-layout__drawer">
-    <span class="mdl-layout-title">Issue filters</span>
+    <span class="mdl-layout-title">Filters</span>
     <nav class="mdl-navigation">
-      <a class="mdl-navigation__link" href="/All">All</a>
+      <a class="mdl-navigation__link" href="/?showAll=true">Show all</a>
+      <a class="mdl-navigation__link" href="/?showAll=false">Show in-stock only</a>
     </nav>
   </div>
 

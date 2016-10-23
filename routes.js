@@ -5,28 +5,67 @@ var router = express.Router();
 
 var userSession = require("./user-session.js");
 var request = require('./request.js');
-var models = require("./iphone-models.js");
 var StockItem = require("./stock-item.js");
 var DeviceModel = require("./device-model.js");
+var AppleStore = require("./apple-store.js");
+
+function init(req) {
+  if (!req.session.showAll) {
+    req.session.showAll = userSession.showAll;
+  }
+  if (!req.session.storesWanted || !Array.isArray(req.session.storesWanted)) {
+    req.session.storesWanted = userSession.storesWanted;
+  }
+  // console.log(req.session.storesWanted);
+
+  if (!req.session.modelsWanted) {
+    req.session.modelsWanted = userSession.modelsWanted;
+  }
+}
 
 router.get('/', function (req, res, next) {
-  request.getStock(userSession, resultArray => {
+  init(req);
+
+  if (req.query.showAll) {  
+    req.session.showAll = req.query.showAll;
+  }
+
+  request.getStock(req.session, resultArray => {
     res.render('index', {
       resultArray: resultArray,
-      headers: StockItem.headers()
+      headers: StockItem.headers(),
+      timeStamp: new Date().toLocaleTimeString(),
+      showAll: req.session.showAll
     });
   });
 });
 
 router.get('/models', function (req, res, next) {
+  init(req);
+
   var resultArray = [];
-  userSession.modelsWanted.forEach((modelCode) => {
+  req.session.modelsWanted.forEach((modelCode) => {
     let deviceModel = new DeviceModel(modelCode);
     resultArray.push(deviceModel);
   });
 
   res.render('models', {
     headers: DeviceModel.headers(),
+    resultArray: resultArray
+  });
+});
+
+router.get('/applestores', function (req, res, next) {
+  init(req);
+
+  var resultArray = [];
+  req.session.storesWanted.forEach((storeNumber) => {
+    let appleStore =  new AppleStore(storeNumber);
+    resultArray.push(appleStore);
+  });
+
+  res.render('applestores', {
+    headers: AppleStore.headers(),
     resultArray: resultArray
   });
 });

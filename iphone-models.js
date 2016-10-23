@@ -175,6 +175,5 @@ function getModel(modelCode) {
     
 module.exports = {
     models: models,
-    getDisplayStr: getDisplayStr,
     getModel : getModel
 }

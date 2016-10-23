@@ -1,6 +1,15 @@
 <div>
-<section>
-  <span class="mdl-card__title-text">{{resultArray.length}} items</span>
+<section class="mdl-grid">
+  <span class="mdl-cell mdl-cell--4-col">{{resultArray.length}} items. Last update: {{timeStamp}}</span>
+	<div class="mdl-layout-spacer"></div>
+	<span class="mdl-cell mdl-cell--2-col">
+		{{#if showAll}}
+			Show all
+		{{else}}
+			Show in-stock only
+		{{/if}}
+		 {{showAll}}</span>
+  <button class="refreshButton mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Refresh</button>
 </section>
 <section id="jira">  
 	<table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
@@ -16,12 +25,17 @@
 			<tr class="main_row">
 				<td class="mdl-data-table__cell--non-numeric summary">{{storeName}}</td>
 				<td class="mdl-data-table__cell--non-numeric summary">{{modelName}}</td>
-				<td class="mdl-data-table__cell--non-numeric">{{avail}}</td>
+				<td class="mdl-data-table__cell--non-numeric">
+					{{#if isAvail}}
+					<img src="http://www.istocknow.com/img/valid.png" height="32" width="32" title="{{avail}}">
+					{{/if}}
+				</td>
 				<td class="mdl-data-table__cell--non-numeric">{{timeStamp}}</td>
 			</tr>
       <tr class="hidden_row">
         <td class="mdl-data-table__cell--non-numeric">{{storeCode}}</td>
         <td class="mdl-data-table__cell--non-numeric">{{modelCode}}</td>
+				<td class="mdl-data-table__cell--non-numeric"><a href="{{buyUrl}}">{{avail}}</a></td>
       </tr>
 			{{/each}}
 		</tbody>

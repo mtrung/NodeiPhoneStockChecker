@@ -1,7 +1,7 @@
 'use strict';
 
-var userSession = require("./user-session.js");
-var models = require("./iphone-models.js");
+var appleStores = require("./apple-stores.js");
+var DeviceModel = require("./device-model.js");
 
 class StockItem {
     static headers() {
@@ -10,15 +10,20 @@ class StockItem {
 
 	constructor(storeCode, modelCode, avail) {
 		this._storeCode = storeCode;
-		this._modelCode = modelCode;
+		// this._modelCode = new DeviceModel(modelCode);
+		this._deviceModel = new DeviceModel(modelCode);
 		this._avail = avail;
 	}
 
 	get avail() {
 		return this._avail;
 	}
+	isAvail() {
+		return this._avail === 'ALL';
+	}
 	get timeStamp() {
-		return this._timeStamp;
+		if (!this._timeStamp) return this._timeStamp; 
+		return new Date(this._timeStamp).toLocaleTimeString();
 	}
 	set timeStamp(timeStamp) {
 		this._timeStamp = timeStamp;
@@ -27,14 +32,22 @@ class StockItem {
 	get storeCode() {
 		return this._storeCode;
 	}
-	get modelCode() {
-		return this._modelCode;
-	}
 	get storeName() {
-		return userSession.storesWanted[this._storeCode];
+		return appleStores[this._storeCode];
+	}
+	get modelCode() {
+		return this._deviceModel.modelCode;
 	}
 	get modelName() {
-		return models.getDisplayStr(this._modelCode);
+		return this._deviceModel.modelName;
+	}
+	buyUrl() {
+		let storage = this._deviceModel.storage + 'gb-';
+		let color = this._deviceModel.color.toLowerCase().replace(/ /, '-');
+		let carrier = this._deviceModel.carrier.toLowerCase().replace(/[-&]/, '');
+		let display = this._deviceModel.display.toLowerCase().replace(/ /g, '-');
+		//http://www.apple.com/shop/buy-iphone/iphone-7/5.5-inch-display-256gb-rose-gold-att
+		return 'http://www.apple.com/shop/buy-iphone/iphone-7/'+display+'-'+storage+color+'-'+carrier;
 	}
 }
 
