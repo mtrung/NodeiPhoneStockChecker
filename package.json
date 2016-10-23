@@ -1,15 +1,16 @@
 {
-  "name": "iphone-stock-checker",
+  "name": "iStockChecker",
   "version": "1.0.0",
-  "description": "Polls the apple in-store reservations checker for iphone stock",
+  "description": "Apple device stock check",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon server.js"
+    "start": "node server.js",
+    "startd": "nodemon server.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TomThorpe/NodeiPhoneStockChecker.git"
+    "url": "https://github.com/mtrung/iStockChecker"
   },
   "keywords": [
     "apple",
@@ -18,12 +19,12 @@
     "instore",
     "in-store"
   ],
-  "author": "Tom Thorpe",
-  "license": "ISC",
+  "author": "Trung Vo",
+  "license": "Unlicensed",
   "bugs": {
-    "url": "https://github.com/TomThorpe/NodeiPhoneStockChecker/issues"
+    "url": "https://github.com/mtrung/iStockChecker/issues"
   },
-  "homepage": "https://github.com/TomThorpe/NodeiPhoneStockChecker#readme",
+  "homepage": "https://github.com/mtrung/iStockChecker#readme",
   "dependencies": {
     "node-cache": "^4.1.0",
     "request": "^2.74.0",
@@ -36,5 +37,4 @@
   "devDependencies": {
     "nodemon": "^1.9.1"
   }
-  
 }
