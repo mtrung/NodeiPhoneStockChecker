@@ -2,13 +2,7 @@
 <section class="mdl-grid">
   <span class="mdl-cell mdl-cell--4-col">{{resultArray.length}} items. Last update: {{timeStamp}}</span>
 	<div class="mdl-layout-spacer"></div>
-	<span class="mdl-cell mdl-cell--2-col">
-		{{#if showAll}}
-			Show all
-		{{else}}
-			Show in-stock only
-		{{/if}}
-		 {{showAll}}</span>
+	<span class="mdl-cell mdl-cell--2-col">{{#if showAll}}Show all{{else}}Show in-stock only{{/if}}</span>
   <button class="refreshButton mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Refresh</button>
 </section>
 <section id="jira">  

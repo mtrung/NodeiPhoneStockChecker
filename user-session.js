@@ -1,6 +1,6 @@
 
 module.exports = {
-	showAll: false,
+	showAll: '0',
 	colors: ['Black', 'Gold'],
 	carriers: ['Verizon', 'T-Mobile'],
 	storesWanted: ['R144', 'R008', 'R302', 'R042', 'R151'],

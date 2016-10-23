@@ -35,7 +35,7 @@ router.get('/', function (req, res, next) {
       resultArray: resultArray,
       headers: StockItem.headers(),
       timeStamp: new Date().toLocaleTimeString(),
-      showAll: req.session.showAll
+      showAll: (req.session.showAll === '1')
     });
   });
 });
