@@ -6,31 +6,28 @@ var router = express.Router();
 var userSession = require("./user-session.js");
 var request = require('./request.js');
 var models = require("./iphone-models.js");
+var StockItem = require("./stock-item.js");
+var DeviceModel = require("./device-model.js");
 
 router.get('/', function (req, res, next) {
   request.getStock(userSession, resultArray => {
     res.render('index', {
-      resultArray: resultArray
+      resultArray: resultArray,
+      headers: StockItem.headers()
     });
   });
 });
 
 router.get('/models', function (req, res, next) {
   var resultArray = [];
-  userSession.modelsWanted.forEach((item) => {
-    let model = models.getModel(item);
-    let resultModel = {
-      modelCode: item,
-      modelName: models.getDisplayStr(item),
-      color: model.c,
-      carrier: model.p,
-      storage: model.g
-    };
-    resultArray.push(resultModel);
+  userSession.modelsWanted.forEach((modelCode) => {
+    let deviceModel = new DeviceModel(modelCode);
+    resultArray.push(deviceModel);
   });
 
   res.render('models', {
-      resultArray: resultArray,
+    headers: DeviceModel.headers(),
+    resultArray: resultArray
   });
 });
 

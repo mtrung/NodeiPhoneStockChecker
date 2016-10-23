@@ -20,7 +20,7 @@ var notificationsSentCache = new NodeCache({
  * @param {object} stores - flattend associative array of stores. Store code as the key, and the store name as the value
  */
 function getStock(userSession, callback) {
-  var stores = userSession.stores;
+  var stores = userSession.storesWanted;
   if (validateWantedModels(userSession.modelsWanted)) {
     if (stores) {
       console.log("# of stores: " + Object.keys(stores).length);
@@ -46,7 +46,7 @@ function getStock(userSession, callback) {
 
           notify.sendProwlMessage("Stores list has been successfully downloaded, stock checker will now start. This is a test prowl message to preview the message you will get when stock arrives", 2);
 
-          userSession.stores = storesFlattend;
+          userSession.storesWanted = storesFlattend;
           getStock(userSession, callback);
         })
         .catch(function (err) {

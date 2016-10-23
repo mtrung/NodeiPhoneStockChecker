@@ -6,11 +6,9 @@
 	<table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
 		<thead>
 			<tr>
-				<th class="mdl-data-table__cell--non-numeric">Model code</th>
-				<th class="mdl-data-table__cell--non-numeric">Model</th>
-				<th class="mdl-data-table__cell--non-numeric">Color</th>
-				<th class="mdl-data-table__cell--non-numeric">Storage</th>
-				<th class="mdl-data-table__cell--non-numeric">Carrier</th>
+				{{#each headers}}
+				<th class="mdl-data-table__cell--non-numeric">{{this}}</th>
+				{{/each}}				
 			</tr>
 		</thead>
 		<tbody>
