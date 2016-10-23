@@ -134,7 +134,7 @@ function processSingleStoreResult(storeCode, inStockStore, stockItemList, unfoun
         stockItemList.push(stockItem);
         // console.log('+'+ stockItem.modelName);
       } else {
-        if (userSession.showAll && userSession.showAll === '1') {
+        if (userSession.showAll) {
         let stockItem = new StockItem(storeCode, modelCode, availStatus);
         stockItemList.push(stockItem);
         // console.log('- '+userSession.showAll + ': '+ stockItem.modelName);

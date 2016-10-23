@@ -27,7 +27,7 @@ router.get('/', function (req, res, next) {
   init(req);
 
   if (req.query.showAll) {  
-    req.session.showAll = req.query.showAll;
+    req.session.showAll = req.query.showAll === '1' ? true : false;
   }
 
   request.getStock(req.session, resultArray => {
@@ -35,7 +35,7 @@ router.get('/', function (req, res, next) {
       resultArray: resultArray,
       headers: StockItem.headers(),
       timeStamp: new Date().toLocaleTimeString(),
-      showAll: (req.session.showAll === '1')
+      session: req.session
     });
   });
 });
