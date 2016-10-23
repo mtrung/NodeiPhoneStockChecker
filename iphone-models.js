@@ -175,8 +175,17 @@ function getDisplayStr(modelCode) {
     }
     return 'iPhone 7+ ' + element.g + 'gb ' + element.c + ' ' + element.p;
 }
+
+function getModel(modelCode) {
+    let element = models[modelCode];
+    if (typeof element == 'string' || element instanceof String) {
+        return;
+    }
+    return element;
+}
     
 module.exports = {
     models: models,
-    getDisplayStr: getDisplayStr
+    getDisplayStr: getDisplayStr,
+    getModel : getModel
 }

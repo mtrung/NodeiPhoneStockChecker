@@ -1,0 +1,31 @@
+<div>
+<section>
+  <span class="mdl-card__title-text">{{resultArray.length}} items</span>
+</section>
+<section id="jira">  
+	<table class="mdl-data-table mdl-js-data-table mdl-shadow--2dp">
+		<thead>
+			<tr>
+				<th class="mdl-data-table__cell--non-numeric">Store</th>
+				<th class="mdl-data-table__cell--non-numeric">Model</th>
+				<th class="mdl-data-table__cell--non-numeric">Available</th>
+				<th class="mdl-data-table__cell--non-numeric">Available since</th>
+			</tr>
+		</thead>
+		<tbody>
+			{{#each resultArray}}
+			<tr class="main_row">
+				<td class="mdl-data-table__cell--non-numeric summary">{{storeName}}</td>
+				<td class="mdl-data-table__cell--non-numeric summary">{{modelName}}</td>
+				<td class="mdl-data-table__cell--non-numeric">{{avail}}</td>
+				<td class="mdl-data-table__cell--non-numeric">{{timeStamp}}</td>
+			</tr>
+      <tr class="hidden_row">
+        <td class="mdl-data-table__cell--non-numeric">{{storeCode}}</td>
+        <td class="mdl-data-table__cell--non-numeric">{{modelCode}}</td>
+      </tr>
+			{{/each}}
+		</tbody>
+	</table>
+</section>
+</div>

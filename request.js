@@ -1,8 +1,11 @@
+'use strict';
+
 var requestPromise = require('request-promise');
 var models = require("./iphone-models.js");
 var NodeCache = require("node-cache");
 var notify = require("./notify.js");
 var config = require("./config.js");
+var StockItem = require("./stock-item.js");
 
 /**
  * Cache to stop messages being sent about stock on every request. If a message was already sent in last x seconds, it wont be sent again
@@ -16,56 +19,61 @@ var notificationsSentCache = new NodeCache({
  * Begin the process to check the stock, then recursively calls itself asyncronously to check the stock again after interval time
  * @param {object} stores - flattend associative array of stores. Store code as the key, and the store name as the value
  */
-function getStock(stores, modelsWanted) {
-    if (validateWantedModels(modelsWanted)) {
-        if (stores) {
-            console.log("# of stores: " + Object.keys(stores).length);
-            if (!config.interval) {
-                getStockRequest(stores, modelsWanted);
-            } else {
-                getStockRequest(stores, modelsWanted)
-                    .delay(config.interval)
-                    .then(function () {
-                        process.nextTick(function () {
-                            getStockRequest(stores, modelsWanted);
-                        }); //nexttick to stop memory leaking in recursion, force async
-                    });
-            }
-        } else {
-            requestPromise(config.storesRequest)
-                .then(function (stores) {
-                    console.log("Downloaded stores list");
-                    var storesFlattend = {};
-                    stores.stores.forEach(function (store) {
-                        storesFlattend[store.storeNumber] = store.storeName
-                    });
-
-                    notify.sendProwlMessage("Stores list has been successfully downloaded, stock checker will now start. This is a test prowl message to preview the message you will get when stock arrives", 2);
-
-                    getStock(storesFlattend, modelsWanted);
-                })
-                .catch(function (err) {
-                    reportError("Error downloading stores " + err);
-                });
-
-        }
+function getStock(userSession, callback) {
+  var stores = userSession.stores;
+  if (validateWantedModels(userSession.modelsWanted)) {
+    if (stores) {
+      console.log("# of stores: " + Object.keys(stores).length);
+      if (!config.interval) {
+        getStockRequest(stores, userSession.modelsWanted, callback);
+      } else {
+        getStockRequest(stores, userSession.modelsWanted, callback)
+          .delay(config.interval)
+          .then(function () {
+            process.nextTick(function () {
+              getStockRequest(stores, userSession.modelsWanted, callback);
+            }); //nexttick to stop memory leaking in recursion, force async
+          });
+      }
     } else {
-        reportError("No valid models");
+      requestPromise(config.storesRequest)
+        .then(function (stores) {
+          console.log("Downloaded stores list");
+          var storesFlattend = {};
+          stores.stores.forEach(function (store) {
+            storesFlattend[store.storeNumber] = store.storeName;
+          });
+
+          notify.sendProwlMessage("Stores list has been successfully downloaded, stock checker will now start. This is a test prowl message to preview the message you will get when stock arrives", 2);
+
+          userSession.stores = storesFlattend;
+          getStock(userSession, callback);
+        })
+        .catch(function (err) {
+          reportError("Error downloading stores " + err);
+          callback([]);
+        });
+
     }
+  } else {
+    reportError("No valid models");
+  }
 }
 
 /**
  * Makes a single call to the stock url to check the stock.
  * @param {object} stores - flattend associative array of stores. Store code as the key, and the store name as the value
  */
-function getStockRequest(stores, modelsWanted) {
+function getStockRequest(stores, modelsWanted, callback) {
   return requestPromise(config.stockRequest)
-    .then(function(stock) {
-      console.log("---");
-      processStock(stores, stock, modelsWanted);
+    .then(function(resultStock) {
+      //console.log("---");
+      var storesWithStock = processStoreListResult(resultStock, stores, modelsWanted);
+      callback(storesWithStock);
     })
     .catch(function(err) {
-      reportError("Error downloading stock list " + err)
+      reportError("Error downloading stock list " + err);
+      callback([]);
     });
 }
 
@@ -74,70 +82,51 @@ function getStockRequest(stores, modelsWanted) {
  * @param {object} stores - flattend associative array of stores. Store code as the key, and the store name as the value
  * @param {object} stock - parsed json retreived from the stock url
  */
-function processStock(stores, stock, modelsWanted) {
+function processStoreListResult(resultStock, stores, modelsWanted) {
   var storesWithStock = [];
   var unfoundModels = {}; //where the model code doesnt exist
 
-  Object.keys(stock).forEach(function(storeCode) {
-    var store = stores[storeCode];
-    if (store == undefined) {
+  Object.keys(resultStock).forEach(function(storeCode) {
+    var storeName = stores[storeCode];
+    if (storeName == undefined) {
       return; //skip non-stores
     }
-    checkStoreStock(store, storeCode, stock, storesWithStock, unfoundModels, modelsWanted);
+    processSingleStoreResult(storeCode, resultStock, storesWithStock, unfoundModels, modelsWanted);
   });
 
-  sendStockMessage(storesWithStock);
-  sendUnfoundModelsMessage(unfoundModels)
+  notify.sendStockMessage(storesWithStock);
+  sendUnfoundModelsMessage(unfoundModels);
+  return storesWithStock;
 }
 
 /**
- * For a single store (represented by storcode) checks that stores stock to see if it has a model you are interested in
+ * For a single store (represented by storeCode) checks that stores stock to see if it has a model you are interested in
  * @param {string} store - The store name (e.g. Covent Garden)
  * @param {object} storeCode - the store code (e.g. R232)
  * @param {object} stock - parsed json retreived from the stock url
  * @param {array} storesWithStock - A string array, stores that have stock of the model you are interest in will be added to this array (in the format of a user displayable string message saying x store has stock of y)
  * @param {object} unfoundModels - associative array, models that were not found in the stores stock list will be added to this so that you can report back to the user that they may have a typo or non-existant model
  */
-function checkStoreStock(store, storeCode, stock, storesWithStock, unfoundModels, modelsWanted) {
-//   console.log('- Store: ' + store);
+function processSingleStoreResult(storeCode, stock, storesWithStock, unfoundModels, modelsWanted) {
+  //console.log('- Store: ' + storeCode);
   var storeStock = stock[storeCode];
 
-  modelsWanted.forEach(function(modelCode) {
+  modelsWanted.forEach(function (modelCode) {
     if (storeStock[modelCode] == undefined) {
       unfoundModels[modelCode] = 1;
     } else {
-    //   console.log(' '+storeStock[modelCode]+': \t' + modelCode + ' ' + models.getDisplayStr(modelCode));
-      if (storeStock[modelCode].toLowerCase() === "all") {
-        addStoreToNotification(storesWithStock, store, modelCode, storeCode);
+      //console.log(' ' + storeStock[modelCode] + ': \t' + modelCode + ' ' + models.getDisplayStr(modelCode));
+      let availStatus = storeStock[modelCode];
+      let stockItem = new StockItem(storeCode, modelCode, availStatus);
+      
+      if (availStatus === "ALL") {
+        timeStamp = addStoreToNotification(storesWithStock, modelCode, storeCode);
+        stockItem.timeStamp = timeStamp;
       }
+
+      storesWithStock.push(stockItem);
     }
   });
-}
-
-/**
- * Send the notification about models found stock (if any - if no models are found no notification will be displayed, and 
- * "No Stock" is diplayed in the console)
- * Sends at most 50 stores at a time, so chunks into multiple messages if there are more stores with stock.
- * @param {array} storesWithStock an array of messages about stock found in stores, e.g. ["model x was found in y", "model z was found in y"]. This will be used as the notificaiton text
- */
-function sendStockMessage(storesWithStock) {
-  if (storesWithStock.length > 0) {
-    var chunks = chunk(storesWithStock, 50);
-
-    chunks.forEach(function(storesChunk){
-      var message = "";
-      storesChunk.forEach(function(storeMessage) {
-        message += storeMessage + "\n";
-      });
-
-      console.log(message);
-      notify.sendProwlMessage(message, 2);
-
-    })
-    
-  } else {
-    console.log("No New Stock");
-  }
 }
 
 /**
@@ -166,30 +155,19 @@ function sendUnfoundModelsMessage(unfoundModels) {
  * @param {string} modelCode - The model found in stock
  * @param {object} storeCode - the store code (e.g. R232) the stock was found in
  */
-function addStoreToNotification(storesWithStock, store, modelCode, storeCode) {
+function addStoreToNotification(storesWithStock, modelCode, storeCode) {
   //check if it is in the cache to say a notification was already recently sent about this store
   var key = storeCode + modelCode;
   var cached = notificationsSentCache.get(key);
+  // if new
   if (cached == undefined) {
-    notificationsSentCache.set(key, "sent");
-    storesWithStock.push(store + " has " + models.getDisplayStr(modelCode));
+    var nowStr = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
+    notificationsSentCache.set(key, nowStr);
+    cached = notificationsSentCache.get(key);
+    //storesWithStock.push(store + " has " + models.getDisplayStr(modelCode));
   }
+  return cached;
 }
-
-/**
- * Chunks an array.
- * Returns an array of arrays, all of max n size
- */
-function chunk (array, size) {
-  return array.reduce(function (res, item, index) {
-    if (index % size === 0) { res.push([]); }
-    res[res.length-1].push(item);
-    return res;
-  }, []);
-}
-
-
-
 
 /**
  * Logs an error on the console and by sending a prowl message
@@ -206,7 +184,7 @@ function reportError(error) {
  */
 function validateWantedModels(modelsWanted) {
   //no wanted models
-  if (modelsWanted.length == 0) {
+  if (!modelsWanted || modelsWanted.length === 0) {
     reportError("You have not set up any wanted models in the modelsWanted property. Polling has NOT started! ");
     return false;
   }

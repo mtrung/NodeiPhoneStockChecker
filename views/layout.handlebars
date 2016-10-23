@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <title>iPhone stock check</title>
+
+  <!-- Material Design Lite -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.amber-pink.min.css">
+  <script defer src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+
+  <!-- jQuery -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+
+  <!-- Local Assets -->
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/script.js"></script>
+
+  <!-- Google Sign-in library -->
+  <!--<meta name="google-signin-scope" content="https://www.googleapis.com/auth/spreadsheets">
+  <meta name="google-signin-client_id" content="{YOUR CLIENT ID}">
+  <script src="https://apis.google.com/js/platform.js" async defer></script>-->
+</head>
+<body class="mdl-demo mdl-color--grey-100 mdl-color-text--grey-700 mdl-base">
+  <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+    <header class="mdl-layout__header mdl-layout__header--scroll mdl-color--primary">
+      <!--<div class="mdl-layout--large-screen-only mdl-layout__header-row"></div>-->
+      <div class="mdl-layout__header-row mdl-layout__header--transparent">
+        <!--<h3><a href="/">Fossil CDG JIRA issues</a></h3>-->
+      <!-- Title -->
+      <span class="mdl-layout-title">iPhone stock check</span>
+      <!-- Add spacer, to align navigation to the right -->  
+      <div class="mdl-layout-spacer"></div>
+      <!-- Navigation -->
+      <nav class="mdl-navigation">
+        <a class="mdl-navigation__link sam" href="/">Check stock</a>
+        <a class="mdl-navigation__link sam" href="/models">Models</a>
+        <a class="mdl-navigation__link rmm" href="/stores">Stores</a>
+      </nav>
+        
+        <div id="spinner" class="mdl-spinner mdl-js-spinner"></div>
+        <!-- Google Sign-in button -->
+        <!--<div id="profile" style="margin: 0 20px;">
+          <b class="name"></b><br/>
+          <i class="email"></i>
+        </div>-->
+        <!--<div class="g-signin2" data-onsuccess="onSignIn"></div>-->
+      </div>
+      <div class="mdl-layout--large-screen-only mdl-layout__header-row"></div>
+    </header>
+  <div class="mdl-layout__drawer">
+    <span class="mdl-layout-title">Issue filters</span>
+    <nav class="mdl-navigation">
+      <a class="mdl-navigation__link" href="/All">All</a>
+    </nav>
+  </div>
+
+    <main class="mdl-layout__content">
+      {{{body}}}
+    </main>
+    <div id="snackbar" class="mdl-js-snackbar mdl-snackbar">
+      <div class="mdl-snackbar__text"></div>
+      <button class="mdl-snackbar__action" type="button"></button>
+    </div>
+  </div>
+</body>
+</html>
