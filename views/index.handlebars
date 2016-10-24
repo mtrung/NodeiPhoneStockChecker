@@ -1,6 +1,7 @@
 <div>
 <section class="mdl-grid">
-  <span class="mdl-cell mdl-cell--6-col">Selected {{session.modelsWanted.length}} models and {{session.storesWanted.length}} stores. Found {{resultArray.length}} items. Last update: {{timeStamp}}</span>
+  <span class="mdl-cell mdl-cell--6-col">Selected {{session.modelsWanted.length}} models and {{session.storesWanted.length}} stores. Found {{resultArray.length}} items.</span>
+  <span class="mdl-cell mdl-cell--2-col last_update">{{{timeStamp}}}</span>		
 	<div class="mdl-layout-spacer"></div>
 	<span class="mdl-cell mdl-cell--2-col">{{#if session.showAll}}Show all{{else}}Show in-stock only{{/if}}</span>
   <button class="refreshButton mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect mdl-button--accent">Refresh</button>

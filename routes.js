@@ -34,7 +34,7 @@ router.get('/', function (req, res, next) {
     res.render('index', {
       resultArray: resultArray,
       headers: StockItem.headers(),
-      timeStamp: new Date().toLocaleTimeString(),
+      timeStamp: new Date().toUTCString(),
       session: req.session
     });
   });
